@@ -1,26 +1,39 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from 'react';
+import TaskForm from './components/taskForm';
+import TaskList from './components/taskList';
+import './styles/index.css';
 
-function App() {
+const App: React.FC = () => {
+  const [tasks, setTasks] = useState<string[]>([]);
+
+  // Carregar tarefas do LocalStorage
+  useEffect(() => {
+    const savedTasks = localStorage.getItem('tasks');
+    if (savedTasks) {
+      setTasks(JSON.parse(savedTasks));
+    }
+  }, []);
+
+  // Salvar tarefas no LocalStorage
+  useEffect(() => {
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+  }, [tasks]);
+
+  const addTask = (task: string) => {
+    setTasks((prevTasks) => [...prevTasks, task]);
+  };
+
+  const deleteTask = (index: number) => {
+    setTasks((prevTasks) => prevTasks.filter((_, i) => i !== index));
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="app">
+      <h1>Lista de Tarefas</h1>
+      <TaskForm onAddTask={addTask} />
+      <TaskList tasks={tasks} onDeleteTask={deleteTask} />
     </div>
   );
-}
+};
 
 export default App;
